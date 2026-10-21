@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · EL MITO{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>{{ title }}</h1>
+  {% if subtitle %}<p class="sub">{{ subtitle }}</p>{% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% include "includes/form_fields.html" %}
+    <button class="btn" type="submit">{{ submit_label }}</button>
+  </form>
+  <div class="links">{% for text, url_name in links %}<a href="{% url url_name %}">{{ text }}</a>{% endfor %}</div>
+</main>
+{% endblock %}

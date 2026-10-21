@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}Your cart — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Your cart</h1></div>
+  {% if summary.lines %}
+  <div class="cart">
+    <ul class="cart__lines">
+      {% for line in summary.lines %}
+      <li class="cart-line">
+        <a class="cart-line__img" href="{{ line.product.get_absolute_url }}">{% if line.image %}<img src="{{ line.image.image.url }}" alt="" width="120" height="150">{% endif %}</a>
+        <div class="cart-line__main">
+          <a class="cart-line__name" href="{{ line.product.get_absolute_url }}">{{ line.product.name }}</a>
+          <p class="card__sub">{{ line.variant.color }} · Size {{ line.variant.size }}</p>
+          <p class="price">{% if line.product.has_discount %}<s>{{ line.product.price|inr }}</s>{% endif %}{{ line.unit_price|inr }}</p>
+          {% if line.problem %}<p class="field-error" role="alert">{{ line.problem }}</p>{% endif %}
+          <div class="cart-line__actions">
+            <form method="post" action="{% url 'cart:update' line.item.pk %}" class="qty">
+              {% csrf_token %}
+              <button type="submit" name="quantity" value="{{ line.quantity|add:'-1' }}" aria-label="Decrease quantity of {{ line.product.name }}">–</button>
+              <span class="qty__value" aria-live="polite">{{ line.quantity }}</span>
+              <button type="submit" name="quantity" value="{{ line.quantity|add:'1' }}" aria-label="Increase quantity of {{ line.product.name }}">+</button>
+            </form>
+            <form method="post" action="{% url 'cart:remove' line.item.pk %}">{% csrf_token %}<button class="btn link" type="submit">Remove</button></form>
+          </div>
+        </div>
+        <div class="cart-line__total price">{{ line.line_total|inr }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <aside class="summary" aria-label="Order summary">
+      <h2>Summary</h2>
+      {% if summary.coupon %}
+      <form method="post" action="{% url 'cart:remove_coupon' %}" class="coupon-applied">{% csrf_token %}
+        <span>Coupon <strong>{{ summary.coupon.code }}</strong> applied</span><button class="btn link" type="submit">Remove</button>
+      </form>
+      {% else %}
+      <form method="post" action="{% url 'cart:apply_coupon' %}" class="inline-form coupon-form">{% csrf_token %}
+        <label class="visually-hidden" for="coupon">Coupon code</label>
+        <input id="coupon" type="text" name="code" placeholder="Coupon code" autocomplete="off" autocapitalize="characters">
+        <button class="btn btn--ghost" type="submit">Apply</button>
+      </form>
+      {% endif %}
+      {% include "includes/totals.html" %}
+      {% if summary.free_shipping_remaining %}<p class="help">Add {{ summary.free_shipping_remaining|inr }} more for free shipping.</p>{% endif %}
+      {% if summary.has_problems %}
+        <button class="btn btn--block" disabled>Checkout</button>
+        <p class="help">Fix the items marked above to continue.</p>
+      {% else %}
+        <a class="btn btn--block" href="{% url 'orders:checkout' %}">Checkout</a>
+      {% endif %}
+      <p class="help" style="margin-top:14px"><a class="link-quiet" href="{% url 'products:shop' %}">Continue shopping</a></p>
+    </aside>
+  </div>
+  {% else %}
+  <div class="empty"><h2>Your cart is empty</h2><p>Pick something you'll wear for years.</p><a class="btn" href="{% url 'products:shop' %}">Shop all</a></div>
+  {% endif %}
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "pages/page.html" %}
+{% load elmito %}
+{% block page_title %}Shipping policy{% endblock %}
+{% block heading %}Shipping policy{% endblock %}
+{% block body %}
+<p class="draft-note">Draft policy. Have it reviewed against your courier terms and applicable law before launch.</p>
+<h2>Where we deliver</h2><p>We deliver to all serviceable pincodes in India.</p>
+<h2>Charges</h2><p>Shipping is free on orders above {{ FREE_SHIPPING_THRESHOLD|inr }}. Orders below that carry a flat charge of {{ FLAT_SHIPPING_CHARGE|inr }}, shown at checkout before you pay.</p>
+<h2>Processing and delivery times</h2>
+<ul><li>Orders are processed and dispatched within 2 working days of payment.</li><li>Delivery typically takes 3–7 working days after dispatch, depending on location.</li><li>Remote locations may take longer.</li></ul>
+<h2>Tracking</h2><p>Once your order ships we'll send you the tracking details by email and WhatsApp.</p>
+<h2>Delivery problems</h2><p>If your order is delayed beyond 10 days, arrives damaged, or is marked delivered but hasn't reached you, contact us and we'll resolve it with the courier.</p>
+{% endblock %}

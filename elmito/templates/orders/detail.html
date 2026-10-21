@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}Order {{ order.order_number }} — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h1>Order {{ order.order_number }}</h1>
+    <p>Placed {{ order.created_at|date:"j F Y" }} · <span class="status status--{{ order.status }}">{{ order.get_status_display }}</span>{% if order.tracking_number %} · Tracking {{ order.tracking_number }}{% endif %}</p>
+  </div>
+  <div class="cart">
+    <div class="review-blocks">
+      <section><h2>Items</h2>
+        <ul class="mini-lines">{% for item in order.items.all %}<li><span>{{ item.quantity }} × {{ item.product_name }}<br><span class="card__sub">{{ item.color }} · {{ item.size }}</span></span><span class="price">{{ item.line_total|inr }}</span></li>{% endfor %}</ul>
+      </section>
+      <section><h2>Delivering to</h2>
+        <p>{{ order.ship_name }}<br>{{ order.ship_line1 }}{% if order.ship_landmark %}, near {{ order.ship_landmark }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Mobile {{ order.ship_phone }}</p>
+      </section>
+      <section><h2>Progress</h2>
+        <ol class="timeline">{% for h in timeline %}<li><strong>{{ h.get_status_display }}</strong> <span class="card__sub">{{ h.created_at|date:"j M, g:i a" }}</span>{% if h.note %}<br><span class="card__sub">{{ h.note }}</span>{% endif %}</li>{% endfor %}</ol>
+      </section>
+    </div>
+    <aside class="summary"><h2>Summary</h2>
+      <dl class="totals">
+        <div><dt>Subtotal</dt><dd>{{ order.subtotal|inr }}</dd></div>
+        {% if order.discount_total %}<div><dt>Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</dt><dd>−{{ order.discount_total|inr }}</dd></div>{% endif %}
+        <div><dt>Shipping</dt><dd>{% if order.shipping_charge %}{{ order.shipping_charge|inr }}{% else %}Free{% endif %}</dd></div>
+        <div class="totals__final"><dt>Total</dt><dd>{{ order.total|inr }}</dd></div>
+      </dl>
+      <p class="help">Payment: {{ order.get_payment_status_display }}{% if order.payment_id %} · {{ order.payment_id }}{% endif %}</p>
+      {% if can_pay %}<a class="btn btn--block" href="{% url 'payments:start' order.order_number %}">Complete payment</a>{% endif %}
+      {% if can_cancel %}
+      <form method="post" action="{% url 'orders:cancel' order.order_number %}" onsubmit="return confirm('Cancel this order?{% if order.is_paid %} You will be refunded.{% endif %}')">{% csrf_token %}
+        <button class="btn btn--ghost btn--block" type="submit">Cancel order</button></form>
+      {% endif %}
+      <p class="help" style="margin-top:14px">Need help? <a class="link-quiet" href="{% url 'core:contact' %}">Contact us</a></p>
+    </aside>
+  </div>
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

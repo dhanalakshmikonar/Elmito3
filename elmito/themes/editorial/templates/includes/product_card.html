@@ -1,0 +1,16 @@
+{% load elmito %}{% with imgs=product.images.all %}
+<article class="pcard">
+  <a class="pcard__link" href="{{ product.get_absolute_url }}">
+    <div class="pcard__media media">
+      {% if imgs %}<img class="pcard__img" data-img src="{{ imgs.0.image.url }}" alt="{{ imgs.0.alt_text|default:product.name }}" loading="lazy" width="900" height="1125">{% if imgs.1 %}<img class="pcard__img pcard__img--alt" data-img src="{{ imgs.1.image.url }}" alt="" loading="lazy" width="900" height="1125">{% endif %}{% endif %}
+      <span class="media__fallback" aria-hidden="true">EL MITO</span>
+      {% if product.has_discount %}<span class="tag tag--sale">Save {{ product|savings_percent }}%</span>{% elif product.is_new_arrival %}<span class="tag">New</span>{% endif %}
+    </div>
+    <div class="pcard__body">
+      <div><h3 class="pcard__name">{{ product.name }}</h3><p class="pcard__cat">{{ product.category.name }}</p></div>
+      <div class="pcard__side"><p class="price">{% if product.has_discount %}<s>{{ product.price|inr }}</s>{% endif %}{{ product.selling_price|inr }}</p>
+        <ul class="swatches" aria-label="Colours">{% for c in product|swatches %}<li style="--c:{{ c.hex }}" title="{{ c.name }}"></li>{% endfor %}</ul></div>
+    </div>
+  </a>
+  <button class="pcard__save" type="button" data-save aria-pressed="false" data-id="{{ product.pk }}" data-name="{{ product.name }}" data-url="{{ product.get_absolute_url }}" data-img="{% if imgs %}{{ imgs.0.image.url }}{% endif %}" data-price="{{ product.selling_price|inr }}">{% include "includes/icon.html" with name="heart" %}</button>
+</article>{% endwith %}

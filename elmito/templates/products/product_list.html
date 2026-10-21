@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{% if searching and filters.q %}Search: {{ filters.q }}{% else %}{{ title }}{% endif %} — EL MITO{% endblock %}
+{% block description %}{% if category and category.description %}{{ category.description }}{% else %}Browse EL MITO T-shirts.{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <h1>{{ title }}</h1>
+    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+  </div>
+
+  {% if not searching %}
+  <nav class="chips" aria-label="Collections" style="margin-bottom:24px">
+    <a class="chip" href="{% url 'products:shop' %}"><span {% if not category %}style="border-color:var(--ink)"{% endif %}>All</span></a>
+    {% for c in categories %}<a class="chip" href="{{ c.get_absolute_url }}"><span {% if category.pk == c.pk %}style="border-color:var(--ink)"{% endif %}>{{ c.name }}</span></a>{% endfor %}
+  </nav>
+  {% endif %}
+
+  <form method="get" id="listing-form">
+    {% if searching %}<input type="hidden" name="q" value="{{ filters.q }}">{% endif %}
+    <div class="toolbar">
+      <button type="button" class="btn link" data-filters-toggle aria-controls="filters-panel">Filters{% if active_filter_count %} ({{ active_filter_count }}){% endif %}</button>
+      <div>
+        <span class="visually-hidden"><label for="sort">Sort by</label></span>
+        <select id="sort" name="sort" data-sort>
+          {% for value, label in sort_options %}<option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <noscript><button class="btn link" type="submit">Apply</button></noscript>
+      </div>
+    </div>
+
+    <div class="filters" id="filters-panel" {% if not active_filter_count %}data-collapsed="true"{% endif %}>
+      <div class="filters-form">
+        {% if searching %}
+        <fieldset><legend>Collection</legend><div class="chips">
+          <label class="chip"><input type="radio" name="category" value="" {% if not filters.category %}checked{% endif %}><span>All</span></label>
+          {% for c in categories %}<label class="chip"><input type="radio" name="category" value="{{ c.slug }}" {% if filters.category == c.slug %}checked{% endif %}><span>{{ c.name }}</span></label>{% endfor %}
+        </div></fieldset>
+        {% endif %}
+        <fieldset><legend>Size</legend><div class="chips">
+          {% for size in facets.sizes %}<label class="chip"><input type="checkbox" name="size" value="{{ size }}" {% if size in filters.sizes %}checked{% endif %}><span>{{ size }}</span></label>{% endfor %}
+        </div></fieldset>
+        <fieldset><legend>Colour</legend><div class="chips">
+          {% for c in facets.colors %}<label class="chip"><input type="checkbox" name="color" value="{{ c.name }}" {% if c.name in filters.colors %}checked{% endif %}><span><i class="swatch" style="background:{{ c.hex }}"></i>{{ c.name }}</span></label>{% endfor %}
+        </div></fieldset>
+        <fieldset><legend>Price (₹)</legend>
+          <div class="price-inputs">
+            <label class="visually-hidden" for="min_price">Minimum price</label><input id="min_price" type="number" min="0" name="min_price" placeholder="Min" value="{{ filters.min_price|default_if_none:'' }}" inputmode="numeric">
+            <span>–</span>
+            <label class="visually-hidden" for="max_price">Maximum price</label><input id="max_price" type="number" min="0" name="max_price" placeholder="Max" value="{{ filters.max_price|default_if_none:'' }}" inputmode="numeric">
+          </div>
+          <div class="chips" style="margin-top:14px"><label class="chip"><input type="checkbox" name="availability" value="in_stock" {% if filters.in_stock_only %}checked{% endif %}><span>In stock only</span></label></div>
+        </fieldset>
+        <div class="filters-actions">
+          <button class="btn" type="submit">Show results</button>
+          {% if active_filter_count %}<a class="link-quiet" href="{{ request.path }}{% if searching and filters.q %}?q={{ filters.q|urlencode }}{% endif %}">Clear filters</a>{% endif %}
+        </div>
+      </div>
+    </div>
+  </form>
+
+  {% if page_obj %}
+  <p class="visually-hidden" role="status">{{ page_obj.paginator.count }} product{{ page_obj.paginator.count|pluralize }}</p>
+  <div class="grid grid--4">{% for product in page_obj %}{% include "includes/product_card.html" %}{% endfor %}</div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination" aria-label="Pages">
+    {% if page_obj.has_previous %}<a class="link-quiet" href="{% querystring page=page_obj.previous_page_number %}" rel="prev">Previous</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="link-quiet" href="{% querystring page=page_obj.next_page_number %}" rel="next">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="empty">
+    <h2>{% if searching and filters.q %}Nothing matches “{{ filters.q }}”{% else %}No products match these filters{% endif %}</h2>
+    <p>Try removing a filter or searching for something broader, like “black” or “tee”.</p>
+    <a class="btn btn--ghost" href="{% url 'products:shop' %}">Browse all products</a>
+  </div>
+  {% endif %}
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

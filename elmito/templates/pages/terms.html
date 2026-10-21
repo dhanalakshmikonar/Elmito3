@@ -1,0 +1,14 @@
+{% extends "pages/page.html" %}
+{% block page_title %}Terms and conditions{% endblock %}
+{% block heading %}Terms &amp; conditions{% endblock %}
+{% block body %}
+<p class="draft-note">Draft terms. Have them reviewed by a qualified professional and add your registered business details before launch.</p>
+<h2>Using this site</h2><p>By placing an order you confirm you are at least 18 years old, or are using the site with a parent or guardian's involvement, and that the information you give us is accurate.</p>
+<h2>Accounts</h2><p>You're responsible for keeping your password and verification codes private. Tell us immediately if you think your account has been used without permission.</p>
+<h2>Products and pricing</h2><p>We try to show colours accurately, but screens vary. Prices are in Indian rupees and include GST. We may correct pricing errors and cancel affected orders, with a full refund.</p>
+<h2>Orders and payment</h2><p>An order is confirmed once payment is successfully received. Payments are processed by Razorpay. We may cancel an order if an item is unavailable or we suspect fraud, and will refund any payment taken.</p>
+<h2>Shipping, returns and refunds</h2><p>These are covered in our <a class="link-quiet" href="{% url 'core:shipping' %}">shipping policy</a> and <a class="link-quiet" href="{% url 'core:returns' %}">returns policy</a>.</p>
+<h2>Intellectual property</h2><p>All content on this site, including images, text and the EL MITO name and logo, belongs to us and may not be used without permission.</p>
+<h2>Liability</h2><p>To the extent permitted by law, our liability for any order is limited to the amount you paid for it.</p>
+<h2>Governing law</h2><p>These terms are governed by the laws of India.</p>
+{% endblock %}

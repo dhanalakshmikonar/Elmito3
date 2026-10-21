@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}My account — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap account">
+  <header class="page-head"><p class="eyebrow"><b>My account</b></p><h1>Hello, <em>{{ user.full_name|first_name }}.</em></h1><p class="muted">{{ user.email }} · {{ user.mobile }}</p></header>
+  <nav class="account__list" aria-label="Account">
+    <a href="{% url 'orders:list' %}"><span class="account__no">01</span><span class="account__name">My orders</span><span class="account__go">{% include "includes/icon.html" with name="arrow" %}</span></a>
+    <a href="{% url 'accounts:addresses' %}"><span class="account__no">02</span><span class="account__name">Addresses</span><span class="account__go">{% include "includes/icon.html" with name="arrow" %}</span></a>
+    <a href="{% url 'accounts:profile' %}"><span class="account__no">03</span><span class="account__name">Profile</span><span class="account__go">{% include "includes/icon.html" with name="arrow" %}</span></a>
+    <a href="{% url 'accounts:change_password' %}"><span class="account__no">04</span><span class="account__name">Change password</span><span class="account__go">{% include "includes/icon.html" with name="arrow" %}</span></a>
+  </nav>
+  <form method="post" action="{% url 'accounts:logout' %}" class="account__out">{% csrf_token %}<button class="btn btn--ghost" type="submit">Sign out</button></form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load elmito static %}
+{% block title %}Payment — EL MITO{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>Payment</h1>
+  <p class="sub">Order {{ order.order_number }} · <strong>{{ order.total|inr }}</strong></p>
+  <p class="help" id="pay-status" role="status">Opening secure payment…</p>
+  <button class="btn btn--block" type="button" id="pay-button">Pay {{ order.total|inr }}</button>
+  <p class="help" style="margin-top:16px">Payments are processed securely by Razorpay. We never see your card details.</p>
+  <noscript><p class="field-error">JavaScript is required to complete payment.</p></noscript>
+  <p class="links"><a href="{% url 'cart:detail' %}">Back to cart</a></p>
+</main>
+{{ config|json_script:"razorpay-config" }}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="{% static 'js/payment.js' %}"></script>
+{% endblock %}

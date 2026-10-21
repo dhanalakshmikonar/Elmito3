@@ -1,0 +1,109 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}EL MITO — Considered T-shirts{% endblock %}</title>
+  <meta name="description" content="{% block description %}Heavyweight cotton T-shirts, cut with restraint and made to outlast the season.{% endblock %}">
+  <meta property="og:site_name" content="EL MITO">
+  <meta property="og:title" content="{% block og_title %}EL MITO{% endblock %}">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+{% with page=request.resolver_match.url_name %}
+<header class="site-header">
+  <div class="wrap site-header__bar">
+    <button class="mobile-menu-toggle" type="button" data-mobile-menu-toggle aria-expanded="false" aria-controls="mobile-nav" aria-label="Open navigation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="nav-main" aria-label="Primary">
+      <a href="{% url 'products:shop' %}" {% if page == 'shop' %}aria-current="page"{% endif %}>Shop</a>
+      {% for c in nav_categories|slice:":3" %}<a href="{{ c.get_absolute_url }}" {% if category and category.pk == c.pk %}aria-current="page"{% endif %}>{{ c.name }}</a>{% endfor %}
+      <a href="{% url 'core:about' %}" {% if page == 'about' %}aria-current="page"{% endif %}>About</a>
+    </nav>
+    <a class="wordmark" href="{% url 'core:home' %}" aria-label="EL MITO home">EL MITO</a>
+    <div class="icon-row">
+      <a class="icon-btn" href="{% url 'products:search' %}" data-search-toggle aria-label="Search" aria-expanded="false" aria-controls="search-panel">{% include "includes/icon.html" with name="search" %}</a>
+      <a class="icon-btn" href="{% if user.is_authenticated %}{% url 'accounts:account' %}{% else %}{% url 'accounts:login' %}{% endif %}" aria-label="Account">{% include "includes/icon.html" with name="user" %}</a>
+      <a class="icon-btn" href="{% url 'cart:detail' %}" aria-label="Cart{% if cart_count %}, {{ cart_count }} item{{ cart_count|pluralize }}{% endif %}">{% include "includes/icon.html" with name="bag" %}{% if cart_count %}<span class="badge">{{ cart_count }}</span>{% endif %}</a>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile primary" hidden>
+    <div class="wrap mobile-nav__inner">
+      <section class="mobile-nav__group" aria-labelledby="mobile-shop-heading">
+        <h2 id="mobile-shop-heading">Shop</h2>
+        <a href="{% url 'products:shop' %}" {% if page == 'shop' %}aria-current="page"{% endif %}>All products</a>
+        {% for c in nav_categories %}<a href="{{ c.get_absolute_url }}" {% if category and category.pk == c.pk %}aria-current="page"{% endif %}>{{ c.name }}</a>{% endfor %}
+      </section>
+      <section class="mobile-nav__group" aria-labelledby="mobile-about-heading">
+        <h2 id="mobile-about-heading">EL MITO</h2>
+        <a href="{% url 'core:about' %}" {% if page == 'about' %}aria-current="page"{% endif %}>About us</a>
+        <a href="{% url 'core:contact' %}">Contact</a>
+      </section>
+      <section class="mobile-nav__group" aria-labelledby="mobile-help-heading">
+        <h2 id="mobile-help-heading">Help</h2>
+        <a href="{% url 'core:faq' %}">FAQ</a>
+        <a href="{% url 'core:shipping' %}">Shipping</a>
+        <a href="{% url 'core:returns' %}">Returns &amp; refunds</a>
+        <a href="{% url 'core:privacy' %}">Privacy policy</a>
+        <a href="{% url 'core:terms' %}">Terms &amp; conditions</a>
+        {% if whatsapp_url %}<a href="{{ whatsapp_url }}" rel="noopener">WhatsApp</a>{% endif %}
+      </section>
+    </div>
+  </nav>
+  <div class="search-panel" id="search-panel" hidden>
+    <div class="wrap">
+      <form action="{% url 'products:search' %}" role="search">
+        <label class="visually-hidden" for="site-search">Search products</label>
+        <input id="site-search" type="search" name="q" placeholder="Search T-shirts" autocomplete="off" value="{% if searching %}{{ filters.q }}{% endif %}">
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+{% if messages %}<ul class="messages" role="status">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+
+<main id="main">{% block content %}{% endblock %}</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand"><a class="wordmark" href="{% url 'core:home' %}">EL MITO</a><p>Considered T-shirts, made to be worn for years.</p></div>
+      <div><h3>Shop</h3><ul>
+        <li><a href="{% url 'products:shop' %}">All products</a></li>
+        {% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}
+      </ul></div>
+      <div><h3>Help</h3><ul>
+        <li><a href="{% url 'core:contact' %}">Contact</a></li>
+        <li><a href="{% url 'core:faq' %}">FAQ</a></li>
+        <li><a href="{% url 'core:shipping' %}">Shipping</a></li>
+        <li><a href="{% url 'core:returns' %}">Returns &amp; refunds</a></li>
+        {% if whatsapp_url %}<li><a href="{{ whatsapp_url }}" rel="noopener">WhatsApp</a></li>{% endif %}
+      </ul></div>
+      <div><h3>Company</h3><ul>
+        <li><a href="{% url 'core:about' %}">About EL MITO</a></li>
+        <li><a href="{% url 'core:privacy' %}">Privacy policy</a></li>
+        <li><a href="{% url 'core:terms' %}">Terms &amp; conditions</a></li>
+      </ul></div>
+    </div>
+    <p class="footer-legal">© {% now "Y" %} EL MITO. All rights reserved. Prices include GST.</p>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="Mobile">
+  <a href="{% url 'core:home' %}" {% if page == 'home' %}aria-current="page"{% endif %}>{% include "includes/icon.html" with name="home" %}Home</a>
+  <a href="{% url 'products:shop' %}" {% if page == 'shop' or page == 'collection' %}aria-current="page"{% endif %}>{% include "includes/icon.html" with name="grid" %}Shop</a>
+  <a href="{% url 'products:search' %}" data-search-toggle {% if page == 'search' %}aria-current="page"{% endif %}>{% include "includes/icon.html" with name="search" %}Search</a>
+  <a href="{% url 'cart:detail' %}" {% if page == 'detail' and request.resolver_match.app_name == 'cart' %}aria-current="page"{% endif %}><span class="tab-icon">{% include "includes/icon.html" with name="bag" %}{% if cart_count %}<span class="badge">{{ cart_count }}</span>{% endif %}</span>Cart</a>
+  <a href="{% if user.is_authenticated %}{% url 'accounts:account' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% include "includes/icon.html" with name="user" %}Account</a>
+</nav>
+{% endwith %}
+<script src="{% static 'js/site.js' %}" defer></script>
+</body>
+</html>

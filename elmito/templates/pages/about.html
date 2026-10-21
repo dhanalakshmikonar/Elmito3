@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}About EL MITO — Considered T-shirts{% endblock %}
+{% block description %}Why EL MITO makes considered T-shirts: thoughtful fabric, consistent fit and pieces made to be worn for years.{% endblock %}
+{% block og_title %}About EL MITO{% endblock %}
+{% block content %}
+<article class="about-page">
+  <header class="about-hero">
+    <img class="about-hero__image" src="{% static 'images/about-editorial.png' %}" alt="Sunlit editorial portrait showing the texture and relaxed fit of an off-white cotton T-shirt" fetchpriority="high">
+    <div class="about-hero__content wrap">
+      <p class="about-kicker"><span aria-hidden="true"></span> Our point of view</p>
+      <h1>Good things<br><em>aren't</em> throwaway.</h1>
+      <div class="about-hero__bottom">
+        <p class="about-hero__lede">EL MITO means “the myth” in Spanish. We chose it as a reminder of the idea we're pushing against: that a good T-shirt is a throwaway.</p>
+        <p class="about-hero__note">A little more thought.<br>A lot more wear.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="about-story wrap" aria-labelledby="about-why">
+    <div class="about-story__label"><span>01</span><span>The everyday, rethought</span></div>
+    <div class="about-story__content">
+      <h2 id="about-why">The most-worn thing in your wardrobe deserves more thought.</h2>
+      <p>It's the garment people wear most and think about least. A T-shirt sits against your skin all day, goes through the wash hundreds of times, and ends up in every outfit. It deserves the same care as a jacket.</p>
+    </div>
+  </section>
+
+  <section class="about-principles" aria-labelledby="about-how">
+    <div class="wrap">
+      <div class="about-principles__intro">
+        <p class="about-kicker">Made with intention</p>
+        <h2 id="about-how">Fewer things.<br>Better considered.</h2>
+      </div>
+      <div class="about-values">
+        <article class="about-value">
+          <span class="about-value__number">01</span>
+          <h3>Start with the fabric</h3>
+          <p>We choose dense combed cotton for the way it feels today and the way it ages over time.</p>
+        </article>
+        <article class="about-value">
+          <span class="about-value__number">02</span>
+          <h3>Keep fit consistent</h3>
+          <p>Each style is cut on a small number of considered blocks, so your size stays your size from one order to the next.</p>
+        </article>
+        <article class="about-value">
+          <span class="about-value__number">03</span>
+          <h3>Release with restraint</h3>
+          <p>We keep our colours quiet and bring out pieces only when we can make them better.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-contact wrap" aria-labelledby="about-contact-title">
+    <div>
+      <p class="about-kicker">A real person, always</p>
+      <h2 id="about-contact-title">Good questions make good things.</h2>
+    </div>
+    <div class="about-contact__action">
+      <p>Questions about fit, fabric or an order? We read everything.</p>
+      <a class="btn" href="{% url 'core:contact' %}">Get in touch <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+</article>
+{% endblock %}

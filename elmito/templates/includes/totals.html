@@ -1,0 +1,7 @@
+{% load elmito %}
+<dl class="totals">
+  <div><dt>Subtotal</dt><dd>{{ summary.subtotal|inr }}</dd></div>
+  {% if summary.discount %}<div><dt>Discount{% if summary.coupon %} ({{ summary.coupon.code }}){% endif %}</dt><dd>−{{ summary.discount|inr }}</dd></div>{% endif %}
+  <div><dt>Shipping</dt><dd>{% if summary.shipping %}{{ summary.shipping|inr }}{% else %}Free{% endif %}</dd></div>
+  <div class="totals__final"><dt>Total</dt><dd>{{ summary.total|inr }}</dd></div>
+</dl>

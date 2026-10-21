@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · EL MITO{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>{{ title }}</h1>
+  <p class="sub">Enter the 6-digit code sent to {{ email }}.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "includes/form_fields.html" %}
+    <button class="btn" type="submit">Verify</button>
+  </form>
+  <form method="post" action="{% url resend_url %}">{% csrf_token %}<button class="btn link" type="submit">Resend code</button></form>
+</main>
+{% endblock %}

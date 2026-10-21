@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Checkout — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Delivery</h1><p>Where should we send your order?</p></div>
+  <div class="cart">
+    <div>
+      {% if addresses %}
+      <form method="post">
+        {% csrf_token %}
+        <fieldset class="address-choices"><legend class="visually-hidden">Delivery address</legend>
+          {% for a in addresses %}
+          <label class="address-choice">
+            <input type="radio" name="address" value="{{ a.pk }}" {% if selected.pk == a.pk %}checked{% endif %}>
+            <span><strong>{{ a.full_name }}</strong><br>{{ a.line1 }}{% if a.landmark %}, near {{ a.landmark }}{% endif %}<br>{{ a.city }}, {{ a.state }} {{ a.pincode }}<br>Mobile {{ a.phone }}</span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        <p class="help" style="margin:16px 0 28px"><a class="link-quiet" href="{% url 'accounts:address_create' %}?next={% url 'orders:checkout' %}">Add a new address</a></p>
+        <button class="btn" type="submit">Continue to review</button>
+      </form>
+      {% else %}
+      <p class="sub">You haven't saved an address yet.</p>
+      <a class="btn" href="{% url 'accounts:address_create' %}?next={% url 'orders:checkout' %}">Add delivery address</a>
+      {% endif %}
+    </div>
+    <aside class="summary"><h2>Your order</h2>{% include "includes/order_lines.html" %}{% include "includes/totals.html" %}</aside>
+  </div>
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

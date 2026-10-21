@@ -1,0 +1,15 @@
+{% extends "pages/page.html" %}
+{% block page_title %}FAQ{% endblock %}
+{% block heading %}Frequently asked questions{% endblock %}
+{% block prose_class %}faq{% endblock %}
+{% load elmito %}
+{% block body %}
+<details><summary>How do I find my size?</summary><p>Use the size guide on any product page. Measurements are for the garment, laid flat. If you're between sizes, size up for a relaxed fit.</p></details>
+<details><summary>How long does delivery take?</summary><p>Orders dispatch within 2 working days and usually arrive in 3–7 days across India. You'll get an email and a WhatsApp message when your order ships.</p></details>
+<details><summary>How much is shipping?</summary><p>Free on orders above {{ FREE_SHIPPING_THRESHOLD|inr }}. Below that, a flat {{ FLAT_SHIPPING_CHARGE|inr }}.</p></details>
+<details><summary>What payment methods do you accept?</summary><p>UPI, debit and credit cards, net banking and wallets, processed securely by Razorpay. We never see or store your card details.</p></details>
+<details><summary>Can I return or exchange an item?</summary><p>Yes. Unworn items with tags can be returned within 7 days of delivery. See the <a class="link-quiet" href="{% url 'core:returns' %}">returns policy</a>.</p></details>
+<details><summary>Why do I need to verify with a code?</summary><p>We send a one-time code to confirm your email when you sign up, and to confirm orders before payment. It protects your account and prevents fraudulent orders.</p></details>
+<details><summary>How do I wash my T-shirt?</summary><p>Machine wash cold with similar colours, then tumble dry low or hang dry. Avoid bleach.</p></details>
+<details><summary>I have a question that isn't here.</summary><p><a class="link-quiet" href="{% url 'core:contact' %}">Contact us</a>{% if whatsapp_url %} or <a class="link-quiet" href="{{ whatsapp_url }}">message us on WhatsApp</a>{% endif %}.</p></details>
+{% endblock %}

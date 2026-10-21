@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Review order — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Review your order</h1></div>
+  <div class="cart">
+    <div class="review-blocks">
+      <section><h2>Delivering to</h2>
+        <p>{{ address.full_name }}<br>{{ address.line1 }}{% if address.landmark %}, near {{ address.landmark }}{% endif %}<br>{{ address.city }}, {{ address.state }} {{ address.pincode }}<br>Mobile {{ address.phone }}</p>
+        <p class="help"><a class="link-quiet" href="{% url 'orders:checkout' %}">Change address</a></p>
+      </section>
+      <section><h2>Items</h2>{% include "includes/order_lines.html" %}<p class="help"><a class="link-quiet" href="{% url 'cart:detail' %}">Edit cart</a></p></section>
+      {% if otp_required %}<p class="help">For your security we'll email you a one-time code to confirm this order before payment.</p>{% endif %}
+    </div>
+    <aside class="summary"><h2>Total</h2>{% include "includes/totals.html" %}
+      <form method="post" action="{% url 'orders:confirm' %}">{% csrf_token %}<button class="btn btn--block" type="submit">Confirm order</button></form>
+    </aside>
+  </div>
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

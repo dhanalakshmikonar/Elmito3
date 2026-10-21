@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}My orders — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>My orders</h1></div>
+  {% if page_obj %}
+  <ul class="addr-list">
+    {% for order in page_obj %}
+    <li>
+      <p><a class="cart-line__name" href="{% url 'orders:detail' order.order_number %}">{{ order.order_number }}</a>
+        <span class="card__sub"> · {{ order.created_at|date:"j M Y" }}</span><br>
+        <span class="status status--{{ order.status }}">{{ order.get_status_display }}</span>
+        · {{ order.total|inr }}<br>
+        <span class="card__sub">{% for item in order.items.all %}{{ item.quantity }} × {{ item.product_name }} ({{ item.color }}, {{ item.size }}){% if not forloop.last %}; {% endif %}{% endfor %}</span></p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination" aria-label="Pages">
+    {% if page_obj.has_previous %}<a class="link-quiet" href="{% querystring page=page_obj.previous_page_number %}">Previous</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="link-quiet" href="{% querystring page=page_obj.next_page_number %}">Next</a>{% endif %}
+  </nav>{% endif %}
+  {% else %}
+  <div class="empty"><h2>No orders yet</h2><p>When you place an order it will appear here.</p><a class="btn" href="{% url 'products:shop' %}">Shop all</a></div>
+  {% endif %}
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

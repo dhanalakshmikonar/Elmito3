@@ -1,0 +1,107 @@
+{% load static elmito %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}EL MITO — Considered T-shirts{% endblock %}</title>
+  <meta name="description" content="{% block description %}Heavyweight cotton T-shirts, cut with restraint and made to outlast the season.{% endblock %}">
+  <meta name="theme-color" content="#F3EFE6">
+  <meta property="og:site_name" content="EL MITO">
+  <meta property="og:title" content="{% block og_title %}EL MITO{% endblock %}">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="preload" href="{% static 'editorial/fonts/InstrumentSerif-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'editorial/fonts/InstrumentSans.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'editorial/css/editorial.css' %}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+{% with page=request.resolver_match.url_name %}
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="announce" role="region" aria-label="Store announcement"><p>Free delivery above {{ FREE_SHIPPING_THRESHOLD|inr }} <span class="announce__extra"><span aria-hidden="true">·</span> Heavyweight cotton, made to last</span></p></div>
+
+<header class="header" data-header>
+  <div class="header__bar">
+    <div class="header__left">
+      <button class="header__menu" type="button" data-menu-open aria-expanded="false" aria-controls="menu"><span class="header__menu-icon" aria-hidden="true"></span>Menu</button>
+      <nav class="header__nav" aria-label="Primary">
+        <a href="{% url 'products:shop' %}" {% if page == 'shop' %}aria-current="page"{% endif %}>Shop</a>
+        {% for c in nav_categories|slice:":3" %}<a href="{{ c.get_absolute_url }}" {% if category and category.pk == c.pk %}aria-current="page"{% endif %}>{{ c.name }}</a>{% endfor %}
+        <a href="{% url 'core:about' %}" {% if page == 'about' %}aria-current="page"{% endif %}>About</a>
+      </nav>
+    </div>
+    <a class="wordmark" href="{% url 'core:home' %}" aria-label="EL MITO, home">EL MITO</a>
+    <div class="header__right">
+      <a class="header__link" href="{% url 'products:search' %}" data-search-open aria-controls="search" aria-expanded="false"><span class="header__label">Search</span><span class="header__icon">{% include "includes/icon.html" with name="search" %}</span></a>
+      <button class="header__link header__link--saved" type="button" data-saved-open aria-controls="saved" aria-expanded="false"><span class="header__label">Saved</span><span class="header__icon">{% include "includes/icon.html" with name="heart" %}</span><span class="count" data-saved-count hidden></span></button>
+      <a class="header__link header__link--account" href="{% if user.is_authenticated %}{% url 'accounts:account' %}{% else %}{% url 'accounts:login' %}{% endif %}"><span class="header__label">{% if user.is_authenticated %}Account{% else %}Sign in{% endif %}</span><span class="header__icon">{% include "includes/icon.html" with name="user" %}</span></a>
+      <a class="header__link header__link--bag" href="{% url 'cart:detail' %}" aria-label="Cart{% if cart_count %}, {{ cart_count }} item{{ cart_count|pluralize }}{% endif %}"><span class="header__label">Cart</span><span class="header__icon">{% include "includes/icon.html" with name="bag" %}</span>{% if cart_count %}<span class="badge">{{ cart_count }}</span>{% endif %}</a>
+    </div>
+  </div>
+</header>
+
+<div class="overlay overlay--menu" id="menu" data-menu hidden role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="overlay__bar"><span class="wordmark wordmark--small">EL MITO</span><button type="button" class="overlay__close" data-close>Close <span aria-hidden="true">{% include "includes/icon.html" with name="close" %}</span></button></div>
+  <nav class="menu" aria-label="Menu">
+    <a href="{% url 'products:shop' %}"><span class="menu__no">01</span><span class="menu__name">Shop all</span></a>
+    {% for c in nav_categories %}<a href="{{ c.get_absolute_url }}"><span class="menu__no">0{{ forloop.counter|add:1 }}</span><span class="menu__name">{{ c.name }}</span></a>{% endfor %}
+    <a href="{% url 'core:about' %}"><span class="menu__no">—</span><span class="menu__name menu__name--small">About</span></a>
+    <a href="{% url 'core:contact' %}"><span class="menu__no">—</span><span class="menu__name menu__name--small">Contact</span></a>
+  </nav>
+  <div class="menu__foot">
+    <a href="{% if user.is_authenticated %}{% url 'accounts:account' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% if user.is_authenticated %}My account{% else %}Sign in or create an account{% endif %}</a>
+    <a href="{% url 'core:faq' %}">FAQ</a>
+    {% if whatsapp_url %}<a href="{{ whatsapp_url }}" rel="noopener">WhatsApp</a>{% endif %}
+  </div>
+</div>
+
+<div class="overlay overlay--search" id="search" data-search hidden role="dialog" aria-modal="true" aria-label="Search">
+  <div class="overlay__bar"><span class="eyebrow">Search the shop</span><button type="button" class="overlay__close" data-close>Close <span aria-hidden="true">{% include "includes/icon.html" with name="close" %}</span></button></div>
+  <form class="searchbox" action="{% url 'products:search' %}" role="search">
+    <label class="visually-hidden" for="site-search">Search products</label>
+    <input id="site-search" type="search" name="q" placeholder="Search T-shirts" autocomplete="off" value="{% if searching %}{{ filters.q }}{% endif %}">
+    <button type="submit" class="searchbox__go" aria-label="Search">{% include "includes/icon.html" with name="arrow" %}</button>
+  </form>
+  <div class="searchbox__hints"><span class="eyebrow">Browse</span>
+    {% for c in nav_categories %}<a class="pill" href="{{ c.get_absolute_url }}">{{ c.name }}</a>{% endfor %}<a class="pill" href="{% url 'products:shop' %}?sort=popular">Most popular</a><a class="pill" href="{% url 'products:shop' %}?sort=newest">Newest</a>
+  </div>
+</div>
+
+<aside class="drawer" id="saved" data-saved hidden role="dialog" aria-modal="true" aria-label="Saved items">
+  <div class="drawer__bar"><h2>Saved</h2><button type="button" class="overlay__close" data-close>Close <span aria-hidden="true">{% include "includes/icon.html" with name="close" %}</span></button></div>
+  <ul class="saved-list" data-saved-list></ul>
+  <div class="empty empty--small" data-saved-empty><p>Nothing saved yet.</p><p class="muted">Tap the heart on any piece to keep it here. Saved items stay on this device.</p></div>
+</aside>
+<div class="scrim" data-scrim hidden></div>
+
+{% if messages %}<ul class="toasts" role="status" aria-live="polite">{% for m in messages %}<li class="toast toast--{{ m.level_tag }}">{{ m }}<button type="button" class="toast__x" data-toast-close aria-label="Dismiss">{% include "includes/icon.html" with name="close" %}</button></li>{% endfor %}</ul>{% endif %}
+
+<main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__lede"><p class="footer__big">Quiet clothes, <em>made to last.</em></p>
+        <a class="link-arrow link-arrow--light" href="{% url 'products:shop' %}">Shop the collection {% include "includes/icon.html" with name="arrow" %}</a></div>
+      <div class="footer__cols">
+        <div><h2>Shop</h2><ul><li><a href="{% url 'products:shop' %}">All products</a></li>{% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}</ul></div>
+        <div><h2>Help</h2><ul><li><a href="{% url 'core:contact' %}">Contact</a></li><li><a href="{% url 'core:faq' %}">FAQ</a></li><li><a href="{% url 'core:shipping' %}">Shipping</a></li><li><a href="{% url 'core:returns' %}">Returns &amp; refunds</a></li>{% if whatsapp_url %}<li><a href="{{ whatsapp_url }}" rel="noopener">WhatsApp</a></li>{% endif %}</ul></div>
+        <div><h2>Company</h2><ul><li><a href="{% url 'core:about' %}">About EL MITO</a></li><li><a href="{% url 'core:privacy' %}">Privacy policy</a></li><li><a href="{% url 'core:terms' %}">Terms &amp; conditions</a></li></ul></div>
+      </div>
+    </div>
+    <p class="footer__giant" aria-hidden="true"></p>
+    <p class="footer__legal">© {% now "Y" %} EL MITO. All rights reserved. Prices include GST.</p>
+  </div>
+</footer>
+
+<nav class="dock" aria-label="Mobile">
+  <a href="{% url 'products:shop' %}" {% if page == 'shop' or page == 'collection' %}aria-current="page"{% endif %}>{% include "includes/icon.html" with name="grid" %}<span>Shop</span></a>
+  <a href="{% url 'products:search' %}" data-search-open>{% include "includes/icon.html" with name="search" %}<span>Search</span></a>
+  <button type="button" data-saved-open>{% include "includes/icon.html" with name="heart" %}<span>Saved</span><i class="dot" data-saved-dot hidden></i></button>
+  <a href="{% url 'cart:detail' %}" {% if request.resolver_match.app_name == 'cart' %}aria-current="page"{% endif %}><span class="dock__icon">{% include "includes/icon.html" with name="bag" %}{% if cart_count %}<i class="dot dot--n">{{ cart_count }}</i>{% endif %}</span><span>Cart</span></a>
+  <a href="{% if user.is_authenticated %}{% url 'accounts:account' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% include "includes/icon.html" with name="user" %}<span>{% if user.is_authenticated %}Account{% else %}Sign in{% endif %}</span></a>
+</nav>
+{% endwith %}
+<script src="{% static 'editorial/js/editorial.js' %}" defer></script>
+</body>
+</html>

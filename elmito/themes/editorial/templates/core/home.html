@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block og_title %}EL MITO — Considered T-shirts{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <p class="eyebrow hero-in"><b>Nº 01</b> The everyday collection</p>
+      <h1 class="hero__title" aria-label="The quiet shape of every day.">
+        <span class="line"><span>The quiet</span></span>
+        <span class="line"><span><em>shape</em> of</span></span>
+        <span class="line"><span>every day.</span></span>
+      </h1>
+      <p class="hero__lede hero-in" style="--d:.45s">Heavyweight cotton T-shirts, cut with restraint and made to outlast the season.</p>
+      <div class="hero__cta hero-in" style="--d:.65s">
+        <a class="btn" href="{% url 'products:shop' %}">Shop the collection</a>
+        <a class="link-arrow" href="#collections">Explore collections {% include "includes/icon.html" with name="arrow" %}</a>
+      </div>
+    </div>
+    <div class="hero__images">
+      {% with img=hero_product.primary_image %}
+      {% if img %}
+      <a class="hero__img hero__img--main media" href="{{ hero_product.get_absolute_url }}" aria-label="{{ hero_product.name }}">
+        <img data-img src="{{ img.image.url }}" alt="{{ img.alt_text|default:hero_product.name }}" width="900" height="1125" fetchpriority="high">
+        <span class="media__fallback" aria-hidden="true">EL MITO</span>
+      </a>
+      {% endif %}
+      {% endwith %}
+      {% with side=new_arrivals.0 %}{% with sideimg=side.primary_image %}
+      {% if sideimg and side != hero_product %}
+      <a class="hero__img hero__img--side media" href="{{ side.get_absolute_url }}" aria-label="{{ side.name }}">
+        <img data-img src="{{ sideimg.image.url }}" alt="{{ sideimg.alt_text|default:side.name }}" width="900" height="1125" loading="lazy">
+        <span class="media__fallback" aria-hidden="true">EL MITO</span>
+      </a>
+      {% endif %}
+      {% endwith %}{% endwith %}
+      {% if hero_product %}<p class="hero__caption"><span>{{ hero_product.name }}</span> <span>{{ hero_product.selling_price|inr }}</span></p>{% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="marquee__track">
+  {% for i in "12" %}<span>Heavyweight cotton</span><span>Cut with restraint</span><span>Made to last</span><span>Worn for years</span>{% endfor %}
+</div></div>
+
+{% if showcase_categories %}
+<section class="section index" id="collections" data-index>
+  <div class="wrap index__grid">
+    <div class="index__head reveal"><p class="eyebrow"><b>Nº 02</b> The collections</p><h2>Three ways to wear <em>one idea.</em></h2></div>
+    <ol class="index__list">
+      {% for c in showcase_categories %}
+      <li class="reveal" style="--d:{{ forloop.counter0 }}00ms"><a class="index__row" href="{{ c.get_absolute_url }}" {% if c.image %}data-preview="{{ c.image.url }}"{% endif %}>
+        <span class="index__num">0{{ forloop.counter }}</span>
+        <span class="index__name">{{ c.name }}</span>
+        <span class="index__desc">{{ c.description|truncatechars:70 }}</span>
+        {% if c.image %}<span class="index__thumb media"><img data-img src="{{ c.image.url }}" alt="" loading="lazy" width="120" height="150"></span>{% endif %}
+        <span class="index__arrow">{% include "includes/icon.html" with name="arrow" %}</span>
+      </a></li>
+      {% endfor %}
+    </ol>
+    <div class="index__preview media" aria-hidden="true">{% with first=showcase_categories.0 %}{% if first.image %}<img data-index-img data-img src="{{ first.image.url }}" alt="" width="900" height="1125">{% endif %}{% endwith %}<span class="media__fallback">EL MITO</span></div>
+  </div>
+</section>
+{% endif %}
+
+{% if featured or new_arrivals %}
+<section class="section section--flush rail-section">
+  <div class="wrap rail__head">
+    <div class="reveal"><p class="eyebrow"><b>Nº 03</b> The oversized edit</p><h2>Cut wide. <em>Worn slow.</em></h2></div>
+    <div class="rail__controls"><button type="button" data-rail-prev aria-label="Previous">{% include "includes/icon.html" with name="arrow" %}</button><button type="button" data-rail-next aria-label="Next">{% include "includes/icon.html" with name="arrow" %}</button></div>
+  </div>
+  <div class="rail" data-rail>
+    <ul class="rail__track" data-rail-track>
+      {% for product in featured|default:new_arrivals %}
+      <li class="rail__item">
+        {% with img=product.primary_image %}
+        <a href="{{ product.get_absolute_url }}">
+          <span class="rail__num" aria-hidden="true">{{ forloop.counter }}</span>
+          <span class="rail__media media">{% if img %}<img data-img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" loading="lazy" width="900" height="1125">{% endif %}<span class="media__fallback" aria-hidden="true">EL MITO</span></span>
+          <span class="rail__meta"><span class="rail__name">{{ product.name }}</span><span class="price">{% if product.has_discount %}<s>{{ product.price|inr }}</s>{% endif %}{{ product.selling_price|inr }}</span></span>
+        </a>
+        {% endwith %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="wrap"><div class="rail__progress" aria-hidden="true"><span data-rail-bar></span></div></div>
+</section>
+{% endif %}
+
+{% if new_arrivals %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal"><div><p class="eyebrow"><b>Nº 04</b> New arrivals</p><h2>Just <em>in.</em></h2></div><a class="link-arrow" href="{% url 'products:shop' %}?sort=newest">See newest {% include "includes/icon.html" with name="arrow" %}</a></div>
+    <ul class="egrid">{% for product in new_arrivals %}<li class="reveal" style="--d:{{ forloop.counter0 }}00ms">{% include "includes/product_card.html" %}</li>{% endfor %}</ul>
+  </div>
+</section>
+{% endif %}
+
+<section class="section manifesto">
+  <div class="wrap manifesto__grid">
+    <p class="eyebrow eyebrow--light reveal"><b>Nº 05</b> A point of view</p>
+    <blockquote class="manifesto__quote reveal">A T-shirt sits against your skin all day. It deserves <em>the same care as a jacket.</em></blockquote>
+    <div class="manifesto__body reveal"><p>EL MITO began with a simple frustration: T-shirts that looked right on day one and wrong by month two. So we started with the cloth, a dense combed cotton that keeps its shape, and worked outwards.</p>
+      <a class="link-arrow link-arrow--light" href="{% url 'core:about' %}">Read our story {% include "includes/icon.html" with name="arrow" %}</a></div>
+  </div>
+</section>
+
+{% if best_sellers %}
+<section class="section">
+  <div class="wrap ranked">
+    <div class="ranked__head reveal"><p class="eyebrow"><b>Nº 06</b> Most worn</p><h2>The ones <em>people keep.</em></h2><a class="link-arrow" href="{% url 'products:shop' %}?sort=popular">See all {% include "includes/icon.html" with name="arrow" %}</a></div>
+    <ol class="ranked__list">
+      {% for product in best_sellers %}{% with img=product.primary_image %}
+      <li class="reveal"><a class="ranked__row" href="{{ product.get_absolute_url }}">
+        <span class="ranked__num">{{ forloop.counter }}</span>
+        <span class="ranked__thumb media">{% if img %}<img data-img src="{{ img.image.url }}" alt="" loading="lazy" width="120" height="150">{% endif %}<span class="media__fallback" aria-hidden="true"></span></span>
+        <span class="ranked__name">{{ product.name }}<small>{{ product.category.name }}</small></span>
+        <span class="price">{% if product.has_discount %}<s>{{ product.price|inr }}</s>{% endif %}{{ product.selling_price|inr }}</span>
+        <span class="ranked__go">{% include "includes/icon.html" with name="arrow" %}</span>
+      </a></li>
+      {% endwith %}{% endfor %}
+    </ol>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--stone">
+  <div class="wrap">
+    <div class="section-head reveal"><div><p class="eyebrow"><b>Nº 07</b> Why EL MITO</p><h2>Made <em>properly.</em></h2></div></div>
+    <div class="values">
+      <div class="value reveal"><span class="value__no">i.</span><h3>Fabric you can feel</h3><p>Heavyweight combed cotton that gets softer with washing instead of thinner.</p></div>
+      <div class="value reveal" style="--d:.1s"><span class="value__no">ii.</span><h3>A fit that holds</h3><p>Pre-shrunk and cut to a consistent block, so your size stays your size.</p></div>
+      <div class="value reveal" style="--d:.2s"><span class="value__no">iii.</span><h3>Looked after end to end</h3><p>Free delivery above {{ FREE_SHIPPING_THRESHOLD|inr }} and easy returns if it isn't right.</p></div>
+    </div>
+  </div>
+</section>
+
+{% if reviews %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal"><div><p class="eyebrow"><b>Nº 08</b> In their words</p><h2>What customers <em>say.</em></h2></div></div>
+    <div class="reviews">
+      {% for r in reviews %}
+      <figure class="review reveal" style="--d:{{ forloop.counter0 }}00ms">
+        <div class="review__stars" role="img" aria-label="{{ r.rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+        {% if r.title %}<h3>“{{ r.title }}”</h3>{% endif %}
+        <blockquote>{{ r.body }}</blockquote>
+        <figcaption>{{ r.user.full_name }} on <a class="link-quiet" href="{{ r.product.get_absolute_url }}">{{ r.product.name }}</a></figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--stone">
+  <div class="wrap letters">
+    <div class="reveal"><p class="eyebrow"><b>Nº 09</b> Letters</p><h2>New pieces, <em>first.</em></h2><p class="muted">Occasional emails about new arrivals. Nothing else.</p></div>
+    <form class="letters__form reveal" method="post" action="{% url 'core:newsletter' %}">
+      {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+      <label class="visually-hidden" for="nl-email">Email address</label>
+      <input id="nl-email" type="email" name="email" placeholder="Your email address" required autocomplete="email">
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+{% if whatsapp_url %}
+<section class="section section--tight">
+  <div class="wrap band reveal">
+    <div><h2>Questions about <em>fit</em> or an order?</h2><p class="muted">Message us on WhatsApp and a real person will reply.</p></div>
+    <a class="btn btn--ghost" href="{{ whatsapp_url }}" rel="noopener">Chat on WhatsApp</a>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

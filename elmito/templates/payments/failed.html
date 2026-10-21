@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Payment problem — EL MITO{% endblock %}
+{% block content %}
+<main class="container"><h1>We couldn't confirm your payment</h1>
+<p class="sub">If money left your account, it will be refunded automatically within 5–7 working days. Nothing has been charged for an order we couldn't confirm.</p>
+<a class="btn" href="{% url 'cart:detail' %}">Back to cart</a>
+<p class="links"><a href="{% url 'core:contact' %}">Contact us</a></p></main>
+{% endblock %}

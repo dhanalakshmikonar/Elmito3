@@ -1,0 +1,17 @@
+{% load elmito %}
+{% with imgs=product.images.all %}
+<a class="card" href="{{ product.get_absolute_url }}">
+  <div class="card__media">
+    {% if imgs %}
+      <img src="{{ imgs.0.image.url }}" alt="{{ imgs.0.alt_text|default:product.name }}" loading="lazy" width="900" height="1125">
+      {% if imgs.1 %}<img src="{{ imgs.1.image.url }}" alt="" loading="lazy" width="900" height="1125">{% endif %}
+    {% endif %}
+    {% if product.has_discount %}<span class="card__flag">Save {{ product|savings_percent }}%</span>
+    {% elif product.is_new_arrival %}<span class="card__flag">New</span>{% endif %}
+  </div>
+  <div class="card__body">
+    <div><div class="card__name">{{ product.name }}</div><div class="card__sub">{{ product.category.name }}</div></div>
+    <div class="price">{% if product.has_discount %}<s>{{ product.price|inr }}</s>{% endif %}{{ product.selling_price|inr }}</div>
+  </div>
+</a>
+{% endwith %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · EL MITO{% endblock %}
+{% block content %}
+{% include "includes/auth_open.html" with split=True %}
+    <p class="eyebrow"><b>One more step</b></p>
+    <h1 class="auth__title">{{ title }}</h1>
+    <p class="sub">Enter the 6-digit code we sent to <strong>{{ email }}</strong>.</p>
+    <form method="post" novalidate class="auth__form">{% csrf_token %}{% include "includes/form_fields.html" %}<button class="btn btn--block" type="submit">Verify</button></form>
+    <form method="post" action="{% url resend_url %}" class="resend">{% csrf_token %}<span class="muted">Didn't get it?</span> <button class="btn link" type="submit">Resend code</button></form>
+  </div>
+</section>
+{% endblock %}

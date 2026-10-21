@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}{{ product.name }} — EL MITO{% endblock %}
+{% block description %}{{ product.description|truncatechars:155 }}{% endblock %}
+{% block og_title %}{{ product.name }}{% endblock %}
+{% block content %}
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'products:shop' %}">Shop</a> / <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+  </nav>
+
+  <div class="pdp">
+    <div class="gallery" data-gallery>
+      <div class="gallery__thumbs" role="group" aria-label="Product images">
+        {% for image in images %}
+        <button type="button" data-id="{{ image.pk }}" data-color="{{ image.color|lower }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Show image {{ forloop.counter }}">
+          <img src="{{ image.image.url }}" alt="" width="64" height="80" loading="lazy">
+        </button>
+        {% endfor %}
+      </div>
+      <div class="gallery__track" tabindex="0" aria-label="Product images, swipe to browse">
+        {% for image in images %}
+        <figure class="gallery__slide" data-id="{{ image.pk }}" data-color="{{ image.color|lower }}">
+          <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" width="900" height="1125" {% if not forloop.first %}loading="lazy"{% endif %}>
+        </figure>
+        {% empty %}
+        <figure class="gallery__slide"></figure>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="pdp__info">
+      <h1>{{ product.name }}</h1>
+      <p class="pdp__price">
+        {% if product.has_discount %}<s>{{ product.price|inr }}</s>{% endif %}
+        <span>{{ product.selling_price|inr }}</span>
+        {% if product.has_discount %}<small>Save {{ product|savings_percent }}%</small>{% endif %}
+      </p>
+      <p class="pdp__desc">{{ product.description }}</p>
+
+      <form id="add-form" method="post" action="{% url 'cart:add' %}" data-pdp novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="product" value="{{ product.pk }}">
+        <input type="hidden" name="variant" value="">
+
+        <div class="opt">
+          <div class="opt__label"><span>Colour</span></div>
+          <div class="chips" role="radiogroup" aria-label="Colour">
+            {% for entry in matrix %}
+            <label class="chip"><input type="radio" name="color" value="{{ entry.color }}" {% if forloop.first %}checked{% endif %}><span><i class="swatch" style="background:{{ entry.hex }}"></i>{{ entry.color }}</span></label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="opt">
+          <div class="opt__label"><span>Size</span><button type="button" data-open-dialog="size-guide">Size guide</button></div>
+          <div class="chips" role="radiogroup" aria-label="Size">
+            {% for size in sizes %}
+            <label class="chip chip--size"><input type="radio" name="size" value="{{ size }}"><span>{{ size }}</span></label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <p class="stock" data-stock aria-live="polite"></p>
+        <p class="field-error" data-error role="alert"></p>
+
+        {% if in_stock %}
+        <div class="qty-row">
+          <div class="qty">
+            <button type="button" data-qty-step="-1" aria-label="Decrease quantity">–</button>
+            <label class="visually-hidden" for="qty">Quantity</label>
+            <input id="qty" type="number" name="quantity" value="1" min="1" max="10" inputmode="numeric">
+            <button type="button" data-qty-step="1" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="btn" type="submit" name="action" value="add" data-add>Add to cart</button>
+        </div>
+        <button class="btn btn--ghost btn--block buy-now" type="submit" name="action" value="buy_now">Buy now</button>
+        {% else %}
+        <button class="btn btn--block" type="button" disabled>Sold out</button>
+        {% endif %}
+      </form>
+
+      <div class="accordion">
+        <details><summary>Shipping</summary><div class="acc-body">Dispatched within 2 working days. Delivery across India in 3–7 days. {% if FREE_SHIPPING_THRESHOLD %}Free above {{ FREE_SHIPPING_THRESHOLD|inr }}, otherwise {{ FLAT_SHIPPING_CHARGE|inr }}.{% endif %} <a class="link-quiet" href="{% url 'core:shipping' %}">Full policy</a></div></details>
+        <details><summary>Returns</summary><div class="acc-body">Unworn items can be returned within 7 days of delivery for an exchange or refund. <a class="link-quiet" href="{% url 'core:returns' %}">Full policy</a></div></details>
+        <details><summary>Fabric and care</summary><div class="acc-body">Heavyweight combed cotton. Machine wash cold with similar colours, tumble dry low or hang dry.</div></details>
+      </div>
+    </div>
+  </div>
+
+  {% if reviews %}
+  <section class="section" style="padding-top:0">
+    <div class="section-head"><h2>Reviews</h2></div>
+    <div class="reviews">
+      {% for r in reviews %}
+      <article class="review">
+        <div class="review__stars" aria-label="{{ r.rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+        {% if r.title %}<h3>{{ r.title }}</h3>{% endif %}<p>{{ r.body }}</p><footer>{{ r.user.full_name }}</footer>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if related %}
+  <section class="section" style="padding-top:0">
+    <div class="section-head"><h2>You may also like</h2></div>
+    <div class="grid grid--4">{% for product in related %}{% include "includes/product_card.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+</div>
+
+{% if in_stock %}
+<div class="sticky-buy" id="sticky-buy">
+  <div><strong>{{ product.name }}</strong><div class="card__sub">{{ product.selling_price|inr }}</div></div>
+  <button class="btn" type="submit" form="add-form" name="action" value="add">Add to cart</button>
+</div>
+{% endif %}
+
+<dialog id="size-guide"><div class="dialog__body">
+  <button class="dialog__close" type="button" data-close-dialog aria-label="Close">×</button>
+  <h2>Size guide</h2>
+  <table class="size-table">
+    <thead><tr><th>Size</th><th>Chest (in)</th><th>Length (in)</th><th>Shoulder (in)</th></tr></thead>
+    <tbody>
+      <tr><td>S</td><td>38</td><td>27</td><td>17</td></tr>
+      <tr><td>M</td><td>40</td><td>28</td><td>18</td></tr>
+      <tr><td>L</td><td>42</td><td>29</td><td>19</td></tr>
+      <tr><td>XL</td><td>44</td><td>30</td><td>20</td></tr>
+    </tbody>
+  </table>
+  <p class="help" style="margin-top:14px">Garment measurements, laid flat. Between sizes? Size up for a relaxed fit.</p>
+</div></dialog>
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged product image"><img alt=""></dialog>
+
+{{ matrix|json_script:"variant-data" }}
+{% endblock %}

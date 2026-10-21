@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block og_title %}EL MITO — Considered T-shirts{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div>
+      <h1><span>Quiet</span><span>clothes that</span><span>last.</span></h1>
+      <p class="hero__lede">Heavyweight cotton T-shirts, cut with restraint and made to outlast the season.</p>
+      <div class="hero__cta">
+        <a class="btn" href="{% url 'products:shop' %}">Shop now</a>
+        <a class="link-quiet" href="#collections">Explore collections</a>
+      </div>
+    </div>
+    {% with img=hero_product.primary_image %}
+    {% if img %}
+    <a class="hero__media" href="{{ hero_product.get_absolute_url }}" aria-label="{{ hero_product.name }}">
+      <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:hero_product.name }}" width="900" height="1125" fetchpriority="high">
+    </a>
+    {% endif %}
+    {% endwith %}
+  </div>
+</section>
+
+{% if featured %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Featured</h2><a class="link-quiet" href="{% url 'products:shop' %}">Shop all</a></div>
+    <div class="grid grid--4">{% for product in featured %}{% include "includes/product_card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if new_arrivals %}
+<section class="section section--stone">
+  <div class="wrap">
+    <div class="section-head"><h2>New arrivals</h2><a class="link-quiet" href="{% url 'products:shop' %}?sort=newest">See newest</a></div>
+    <div class="grid grid--4">{% for product in new_arrivals %}{% include "includes/product_card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if showcase_categories %}
+<section class="section" id="collections">
+  <div class="wrap">
+    <div class="section-head"><h2>Collections</h2></div>
+    <div class="collections">
+      {% for c in showcase_categories %}
+      <a class="collection" href="{{ c.get_absolute_url }}">
+        {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy" width="900" height="1125">{% endif %}
+        <span class="collection__label">{{ c.name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if best_sellers %}
+<section class="section section--stone">
+  <div class="wrap">
+    <div class="section-head"><h2>Best sellers</h2><a class="link-quiet" href="{% url 'products:shop' %}?sort=popular">See all</a></div>
+    <div class="grid grid--4">{% for product in best_sellers %}{% include "includes/product_card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="wrap story">
+    <h2>One fabric. One fit. Made properly.</h2>
+    <div>
+      <p>EL MITO began with a simple frustration: T-shirts that looked right on day one and wrong by month two. So we started with the cloth, a dense combed cotton that keeps its shape, and worked outwards.</p>
+      <p>Every piece is cut with a clean neckline and a straight, unhurried silhouette. No loud prints, no seasonal noise. Just the T-shirt you reach for first.</p>
+      <p style="margin-top:28px"><a class="link-quiet" href="{% url 'core:about' %}">Read our story</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--stone">
+  <div class="wrap">
+    <div class="section-head"><h2>Why EL MITO</h2></div>
+    <div class="values">
+      <div class="value"><h3>Fabric you can feel</h3><p>Heavyweight combed cotton that gets softer with washing instead of thinner.</p></div>
+      <div class="value"><h3>A fit that holds</h3><p>Pre-shrunk and cut to a consistent block, so your size stays your size.</p></div>
+      <div class="value"><h3>Looked after end to end</h3><p>Free delivery above {{ FREE_SHIPPING_THRESHOLD|inr }} and easy returns if it isn't right.</p></div>
+    </div>
+  </div>
+</section>
+
+{% if reviews %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>What customers say</h2></div>
+    <div class="reviews">
+      {% for r in reviews %}
+      <article class="review">
+        <div class="review__stars" aria-label="{{ r.rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+        {% if r.title %}<h3>{{ r.title }}</h3>{% endif %}
+        <p>{{ r.body }}</p>
+        <footer>{{ r.user.full_name }}, on <a class="link-quiet" href="{{ r.product.get_absolute_url }}">{{ r.product.name }}</a></footer>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--stone">
+  <div class="wrap band">
+    <div><h2>New pieces, first.</h2><p>Occasional emails about new arrivals. Nothing else.</p></div>
+    <form class="inline-form" method="post" action="{% url 'core:newsletter' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <label class="visually-hidden" for="nl-email">Email address</label>
+      <input id="nl-email" type="email" name="email" placeholder="Email address" required autocomplete="email">
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+{% if whatsapp_url %}
+<section class="section">
+  <div class="wrap band">
+    <div><h2>Questions about fit or an order?</h2><p>Message us on WhatsApp and a real person will reply.</p></div>
+    <a class="btn btn--ghost" href="{{ whatsapp_url }}" rel="noopener">Chat on WhatsApp</a>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

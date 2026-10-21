@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ title }} · EL MITO{% endblock %}
+{% block content %}
+{% with page=request.resolver_match.url_name %}
+{% if page == 'login' or page == 'signup' or page == 'forgot_password' or page == 'reset_password' %}{% include "includes/auth_open.html" with split=True %}{% else %}{% include "includes/auth_open.html" with split=False %}{% endif %}
+    <p class="eyebrow"><b>{% if page == 'login' %}Welcome back{% elif page == 'signup' %}Join EL MITO{% elif page == 'forgot_password' or page == 'reset_password' %}Account recovery{% else %}Your account{% endif %}</b></p>
+    <h1 class="auth__title">{{ title }}</h1>
+    {% if subtitle %}<p class="sub">{{ subtitle }}</p>{% endif %}
+    <form method="post" novalidate class="auth__form">
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% include "includes/form_fields.html" %}
+      <button class="btn btn--block" type="submit">{{ submit_label }}</button>
+    </form>
+    <div class="links">{% for text, url_name in links %}<a href="{% url url_name %}">{{ text }}</a>{% endfor %}</div>
+  </div>
+</section>
+{% endwith %}
+{% endblock %}

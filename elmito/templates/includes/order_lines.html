@@ -1,0 +1,6 @@
+{% load elmito %}
+<ul class="mini-lines">
+  {% for line in summary.lines %}
+  <li><span>{{ line.quantity }} × {{ line.product.name }}<br><span class="card__sub">{{ line.variant.color }} · {{ line.variant.size }}</span></span><span class="price">{{ line.line_total|inr }}</span></li>
+  {% endfor %}
+</ul>

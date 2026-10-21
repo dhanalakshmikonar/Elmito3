@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Confirm your order — EL MITO{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>Confirm your order</h1>
+  <p class="sub">Enter the 6-digit code we emailed to {{ order.user.email }} to confirm order {{ order.order_number }}.</p>
+  <form method="post" novalidate>{% csrf_token %}{% include "includes/form_fields.html" %}<button class="btn" type="submit">Confirm and continue</button></form>
+  <form method="post" action="{% url 'orders:resend_otp' order.order_number %}">{% csrf_token %}<button class="btn link" type="submit">Resend code</button></form>
+</main>
+{% endblock %}

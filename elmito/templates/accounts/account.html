@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container">
+  <h1>My account</h1>
+  <p class="sub">{{ user.full_name }} · {{ user.email }}</p>
+  <div class="links">
+    <a href="{% url 'orders:list' %}">My orders</a>
+    <a href="{% url 'accounts:profile' %}">Profile</a>
+    <a href="{% url 'accounts:addresses' %}">Addresses</a>
+    <a href="{% url 'accounts:change_password' %}">Change password</a>
+    <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn link" type="submit">Sign out</button></form>
+  </div>
+</main>
+{% endblock %}

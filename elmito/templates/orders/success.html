@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load elmito %}
+{% block title %}Order {{ order.order_number }} — EL MITO{% endblock %}
+{% block head_extra %}{% if confirming %}<meta http-equiv="refresh" content="6">{% endif %}{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    {% if order.status == "refunded" %}
+      <h1>We couldn't complete this order</h1>
+      <p>An item sold out while you were paying. Your payment of {{ order.total|inr }} has been refunded and should reach you in 5–7 working days.</p>
+    {% elif order.status == "cancelled" and order.is_paid %}
+      <h1>We couldn't complete this order</h1>
+      <p>An item sold out while you were paying. We're refunding {{ order.total|inr }} to your original payment method.</p>
+    {% elif order.is_paid %}
+      <h1>Thank you, {{ order.user.full_name|first_name }}.</h1>
+      <p>Order <strong>{{ order.order_number }}</strong> is confirmed. We'll message you when it ships.</p>
+    {% else %}
+      <h1>Confirming your payment…</h1>
+      <p>This page refreshes automatically. If you've been charged, your order will confirm within a minute.</p>
+    {% endif %}
+  </div>
+  <div class="cart">
+    <div class="review-blocks">
+      <section><h2>Items</h2>
+        <ul class="mini-lines">{% for item in order.items.all %}<li><span>{{ item.quantity }} × {{ item.product_name }}<br><span class="card__sub">{{ item.color }} · {{ item.size }}</span></span><span class="price">{{ item.line_total|inr }}</span></li>{% endfor %}</ul>
+      </section>
+      <section><h2>Delivering to</h2>
+        <p>{{ order.ship_name }}<br>{{ order.ship_line1 }}{% if order.ship_landmark %}, near {{ order.ship_landmark }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Mobile {{ order.ship_phone }}</p>
+      </section>
+    </div>
+    <aside class="summary"><h2>Summary</h2>
+      <dl class="totals">
+        <div><dt>Subtotal</dt><dd>{{ order.subtotal|inr }}</dd></div>
+        {% if order.discount_total %}<div><dt>Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</dt><dd>−{{ order.discount_total|inr }}</dd></div>{% endif %}
+        <div><dt>Shipping</dt><dd>{% if order.shipping_charge %}{{ order.shipping_charge|inr }}{% else %}Free{% endif %}</dd></div>
+        <div class="totals__final"><dt>Total</dt><dd>{{ order.total|inr }}</dd></div>
+      </dl>
+      {% if order.payment_id %}<p class="help">Payment reference {{ order.payment_id }}</p>{% endif %}
+      <a class="btn btn--block" href="{% url 'orders:detail' order.order_number %}">View order</a>
+      <a class="btn btn--ghost btn--block" href="{% url 'products:shop' %}" style="margin-top:12px">Continue shopping</a>
+    </aside>
+  </div>
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

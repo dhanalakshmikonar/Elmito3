@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap errpage">
+  <p class="errpage__code" aria-hidden="true">404</p>
+  <h1>This page has <em>gone quiet.</em></h1>
+  <p class="muted">The link may be old, or the piece may no longer be available.</p>
+  <div class="errpage__cta"><a class="btn" href="{% url 'products:shop' %}">Shop all</a><a class="link-arrow" href="{% url 'core:home' %}">Back home {% include "includes/icon.html" with name="arrow" %}</a></div>
+</div>
+{% endblock %}

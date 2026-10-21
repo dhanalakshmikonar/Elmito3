@@ -1,0 +1,14 @@
+{% extends "pages/page.html" %}
+{% block page_title %}Privacy policy{% endblock %}
+{% block heading %}Privacy policy{% endblock %}
+{% block body %}
+<p class="draft-note">Draft policy. Have it reviewed by a qualified professional to confirm it meets the Digital Personal Data Protection Act, 2023 and your actual data practices.</p>
+<h2>What we collect</h2>
+<ul><li>Account details: name, email, mobile number, username.</li><li>Delivery details: shipping address and phone number.</li><li>Order history and payment status. Card and UPI details are handled by Razorpay and are never stored by us.</li><li>Messages you send us, and your email if you subscribe to our newsletter.</li></ul>
+<h2>How we use it</h2>
+<ul><li>To create your account, verify it, and process and deliver your orders.</li><li>To send order confirmations and shipping updates by email and WhatsApp.</li><li>To prevent fraud and keep your account secure.</li><li>To send newsletters, only if you've subscribed. You can unsubscribe at any time.</li></ul>
+<h2>Who we share it with</h2><p>Only service providers needed to run the store: our payment processor (Razorpay), messaging providers for email and WhatsApp, and delivery partners. We do not sell your data.</p>
+<h2>Cookies</h2><p>We use essential cookies to keep you signed in and to protect forms from forgery. We don't use advertising cookies.</p>
+<h2>Your rights</h2><p>You can ask us to access, correct or delete your data by contacting us.</p>
+<h2>Contact</h2><p>Questions about this policy? <a class="link-quiet" href="{% url 'core:contact' %}">Get in touch</a>.</p>
+{% endblock %}

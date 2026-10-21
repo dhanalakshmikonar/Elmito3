@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{% block page_title %}{% endblock %} — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>{% block heading %}{% endblock %}</h1></div>
+  <div class="prose {% block prose_class %}{% endblock %}">{% block body %}{% endblock %}</div>
+</div>
+{% endblock %}

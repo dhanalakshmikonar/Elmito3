@@ -1,0 +1,32 @@
+{% extends "admin/index.html" %}
+{% block content %}
+{% if dashboard %}
+<section class="elmito-admin-metrics" aria-label="Store overview">
+  <article class="module elmito-admin-metric"><h2>Today</h2><p class="elmito-admin-metric__value">₹{{ dashboard.today.total|default:0|floatformat:"0g" }}</p><p>{{ dashboard.today.n }} paid order{{ dashboard.today.n|pluralize }}</p></article>
+  <article class="module elmito-admin-metric"><h2>Last 7 days</h2><p class="elmito-admin-metric__value">₹{{ dashboard.week.total|default:0|floatformat:"0g" }}</p><p>{{ dashboard.week.n }} paid order{{ dashboard.week.n|pluralize }}</p></article>
+  <article class="module elmito-admin-metric"><h2>Last 30 days</h2><p class="elmito-admin-metric__value">₹{{ dashboard.month.total|default:0|floatformat:"0g" }}</p><p>{{ dashboard.month.n }} paid order{{ dashboard.month.n|pluralize }}</p></article>
+  <article class="module elmito-admin-metric"><h2>To fulfil</h2><p class="elmito-admin-metric__value"><a href="{% url 'admin:orders_order_changelist' %}?status__in=paid,processing,packed">{{ dashboard.to_fulfil }}</a></p><p>{{ dashboard.in_transit }} in transit</p></article>
+  <article class="module elmito-admin-metric"><h2>Low stock</h2><p class="elmito-admin-metric__value"><a href="{% url 'admin:products_productvariant_changelist' %}">{{ dashboard.low_stock }}</a></p><p>Variants at 3 or fewer</p></article>
+  <article class="module elmito-admin-metric"><h2>New customers</h2><p class="elmito-admin-metric__value">{{ dashboard.new_customers }}</p><p>Last 7 days · {{ dashboard.open_messages }} open message{{ dashboard.open_messages|pluralize }}</p></article>
+</section>
+{% if dashboard.recent %}
+<section class="module elmito-admin-recent" aria-labelledby="recent-orders-heading">
+  <h2 id="recent-orders-heading">Recent orders</h2>
+  <div class="elmito-admin-recent__grid">
+    {% for o in dashboard.recent %}
+    <article class="elmito-admin-order">
+      <h3><a href="{% url 'admin:orders_order_change' o.pk %}">{{ o.order_number }}</a></h3>
+      <dl>
+        <div><dt>Customer</dt><dd>{{ o.user.full_name }}</dd></div>
+        <div><dt>Total</dt><dd>₹{{ o.total|floatformat:"0g" }}</dd></div>
+        <div><dt>Status</dt><dd>{{ o.get_status_display }}</dd></div>
+        <div><dt>Placed</dt><dd>{{ o.created_at|date:"j M, g:i a" }}</dd></div>
+      </dl>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endif %}
+{{ block.super }}
+{% endblock %}

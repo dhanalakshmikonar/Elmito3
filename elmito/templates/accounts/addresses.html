@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Addresses — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Addresses</h1></div>
+  {% if addresses %}
+  <ul class="addr-list">
+    {% for a in addresses %}
+    <li>
+      <p><strong>{{ a.full_name }}</strong>{% if a.is_default %} <span class="card__sub">Default</span>{% endif %}<br>{{ a.line1 }}{% if a.landmark %}, near {{ a.landmark }}{% endif %}<br>{{ a.city }}, {{ a.state }} {{ a.pincode }}<br>Mobile {{ a.phone }}</p>
+      <div class="cart-line__actions">
+        <a class="link-quiet" href="{% url 'accounts:address_edit' a.pk %}">Edit</a>
+        {% if not a.is_default %}<form method="post" action="{% url 'accounts:address_default' a.pk %}">{% csrf_token %}<button class="btn link" type="submit">Make default</button></form>{% endif %}
+        <form method="post" action="{% url 'accounts:address_delete' a.pk %}">{% csrf_token %}<button class="btn link" type="submit">Delete</button></form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<div class="empty"><h2>No saved addresses</h2><p>Add one to speed up checkout.</p></div>{% endif %}
+  <p><a class="btn" href="{% url 'accounts:address_create' %}">Add an address</a></p>
+  <div style="height:96px"></div>
+</div>
+{% endblock %}

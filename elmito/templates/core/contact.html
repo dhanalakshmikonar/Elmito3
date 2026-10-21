@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Contact — EL MITO{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="page-head"><h1>Contact</h1><p>Questions about fit, fabric or an order? We reply within one working day.</p></div>
+  <div class="contact-grid">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      {% for field in form %}
+        {% if field.name == "website" %}<div class="hp" aria-hidden="true">{{ field.label_tag }}{{ field }}</div>
+        {% else %}<div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endif %}
+      {% endfor %}
+      <button class="btn" type="submit">Send message</button>
+    </form>
+    <dl>
+      {% if whatsapp_url %}<div><dt>WhatsApp</dt><dd><a class="link-quiet" href="{{ whatsapp_url }}" rel="noopener">Start a chat</a></dd></div>{% endif %}
+      <div><dt>Hours</dt><dd>Monday to Saturday, 10:00 to 18:00 IST</dd></div>
+      <div><dt>Orders</dt><dd>Include your order number so we can find it quickly.</dd></div>
+    </dl>
+  </div>
+</div>
+{% endblock %}

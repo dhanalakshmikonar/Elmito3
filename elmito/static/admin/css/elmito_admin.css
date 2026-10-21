@@ -1,0 +1,45 @@
+.elmito-admin-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 185px), 1fr)); gap: 12px; margin-bottom: 24px; }
+.elmito-admin-metric { min-width: 0; margin: 0; padding: 16px; }
+.elmito-admin-metric h2 { margin: 0 0 8px; font-size: 14px; }
+.elmito-admin-metric p { margin: 0; overflow-wrap: anywhere; }
+.elmito-admin-metric__value { margin-bottom: 4px !important; font-size: clamp(1.35rem, 3vw, 1.8rem); font-weight: 600; line-height: 1.2; }
+.elmito-admin-recent { margin-bottom: 24px; padding: 16px; }
+.elmito-admin-recent > h2 { margin: 0 0 14px; }
+.elmito-admin-recent__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+.elmito-admin-order { min-width: 0; padding: 14px; border: 1px solid #d9dfe3; border-radius: 8px; background: #fff; }
+.elmito-admin-order h3 { margin: 0 0 10px; font-size: 14px; }
+.elmito-admin-order dl { margin: 0; }
+.elmito-admin-order dl > div { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; padding: 5px 0; border-top: 1px solid #edf0f2; }
+.elmito-admin-order dt { color: #5c6870; font-weight: 600; }
+.elmito-admin-order dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 782px) {
+  #content { padding: 16px; }
+  #content-main, #content-related { float: none; width: 100%; margin: 0; }
+  #content-related { margin-top: 18px; }
+  .object-tools { float: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; }
+  .object-tools li { margin: 0; }
+  .object-tools a { min-height: 40px; display: inline-flex; align-items: center; }
+  #changelist { display: flex; flex-direction: column; gap: 12px; }
+  #changelist-filter { order: 1; float: none; width: 100%; margin: 0; box-sizing: border-box; }
+  #changelist-form { order: 2; min-width: 0; width: 100%; }
+  #changelist-form .results { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #result_list { min-width: 620px; }
+  #changelist .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #changelist .actions select { flex: 1 1 180px; min-height: 42px; }
+  #changelist .actions button { min-height: 42px; }
+  .submit-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .submit-row input, .submit-row button { flex: 1 1 145px; min-height: 44px; }
+  .elmito-admin-recent { padding: 12px; }
+  .elmito-admin-order { padding: 12px; }
+}
+
+@media (max-width: 420px) {
+  #content { padding: 12px; }
+  .elmito-admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .elmito-admin-metric { padding: 12px; }
+  .elmito-admin-metric h2 { font-size: 12px; }
+  .elmito-admin-metric p { font-size: 12px; }
+  .elmito-admin-metric__value { font-size: 1.2rem !important; }
+  .elmito-admin-order dl > div { grid-template-columns: 68px minmax(0, 1fr); }
+}
