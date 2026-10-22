@@ -5,5 +5,4 @@ __pycache__/
 *.log
 staticfiles/
 
-# media/ and db.sqlite3 remain tracked as the initial catalogue seed. Render copies them to its
-# persistent disk on first boot; later live admin changes live on that disk. See DEPLOYMENT.md.
+# media/ and db.sqlite3 are tracked catalogue snapshots, matching Elmito Store 1. See DEPLOYMENT.md.

@@ -2,38 +2,21 @@
 set -o errexit
 export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.prod}"
 
-# Render's service filesystem is temporary. Use the attached persistent disk
-# automatically unless the service explicitly supplies a database/media path.
+# Elmito Store 1 deployment style: use the checked-in SQLite/media snapshot on
+# Render Free. Ignore old optional disk settings if they are still configured.
 if [[ -n "${RENDER_EXTERNAL_HOSTNAME:-}" ]]; then
-  export MEDIA_ROOT="${MEDIA_ROOT:-/var/data/media}"
-  if [[ -z "${DATABASE_URL:-}" || ( "$DATABASE_URL" == sqlite:* && "$DATABASE_URL" != *"/var/data/"* ) ]]; then
-    export DATABASE_URL="sqlite:////var/data/db.sqlite3"
+  if [[ "${DATABASE_URL:-}" == sqlite:*"/var/data/"* ]]; then
+    unset DATABASE_URL
   fi
-  # Never try to create /var/data on Render's read-only service filesystem.
-  # It exists and is writable only after a persistent disk is attached there.
-  if [[ "$DATABASE_URL" == *"/var/data/"* || ( -z "${CLOUDINARY_URL:-}" && "$MEDIA_ROOT" == /var/data* ) ]]; then
-    if [[ ! -d /var/data || ! -w /var/data ]]; then
-      echo "ERROR: Render persistent disk is missing or not writable at /var/data." >&2
-      echo "In Render > Elmito3 > Settings/Disks, attach a disk with mount path /var/data, then redeploy." >&2
-      echo "Alternatively, configure PostgreSQL DATABASE_URL and Cloudinary CLOUDINARY_URL instead." >&2
-      exit 1
-    fi
+  if [[ "${MEDIA_ROOT:-}" == "/var/data/media" ]]; then
+    unset MEDIA_ROOT
   fi
 fi
 
-# A Render persistent disk is mounted only at runtime, so copy bundled media
-# there before Django starts serving files. Keep files already on the disk.
+# If a custom MEDIA_ROOT is configured, seed it from the bundled source media.
 if [[ -n "${MEDIA_ROOT:-}" && "$MEDIA_ROOT" != "$PWD/media" && -d "$PWD/media" ]]; then
   mkdir -p "$MEDIA_ROOT"
   cp -an "$PWD/media/." "$MEDIA_ROOT/"
-fi
-
-# Seed the persistent SQLite database from the committed catalogue only on
-# its first start; subsequent deploys keep all live admin changes on the disk.
-if [[ "${DATABASE_URL:-}" == *"/var/data/db.sqlite3" ]]; then
-  if [[ ! -f /var/data/db.sqlite3 && -f "$PWD/db.sqlite3" ]]; then
-    cp "$PWD/db.sqlite3" /var/data/db.sqlite3
-  fi
 fi
 
 python manage.py migrate --noinput

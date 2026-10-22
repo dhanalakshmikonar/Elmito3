@@ -10,37 +10,25 @@
 
 Other variables (Razorpay, WhatsApp, email, admin bootstrap) are listed in `.env.example`.
 
-## Persistent products, images and orders
+## Products and images: source snapshot workflow
 
-Attach a Render persistent disk to the web service:
+This uses the same setup as **Elmito Store 1**. Leave Render's `DATABASE_URL` and `MEDIA_ROOT` unset (the start
+script clears old `/var/data` values if they remain configured). Django uses the checked-in `db.sqlite3` and
+`media/` files. These contain the catalogue snapshot used on each deploy, so product additions made on your
+computer can be carried to Render by committing and pushing both the database and uploaded media files.
 
-1. Open the service's **Settings > Disks** and add a disk mounted at `/var/data`. The service cannot start in
-   persistent-disk mode until this disk is attached; the startup script reports this directly if the mount is
-   missing or not writable.
-2. Redeploy. The start script seeds `/var/data/db.sqlite3` from the committed catalogue once, then uses that
-   database and `/var/data/media` for future requests. Product or image changes made in `/admin/` on the live
-   site survive code pushes, restarts and free-service spin-downs. Customers, orders and payments are stored
-   there too.
-3. Leave `DATABASE_URL` and `MEDIA_ROOT` unset to use these persistent-disk defaults. If you set them yourself,
-   use `sqlite:////var/data/db.sqlite3` and `/var/data/media` respectively. Do not set `CLOUDINARY_URL` unless
-   you want images stored in Cloudinary instead.
+To add products this way, run the site locally, use the local `/admin/`, then commit and push the changed
+`db.sqlite3` and `media/` files with your code. Render deploys without requiring a persistent disk.
 
-Localhost continues to use the repository's `db.sqlite3` and `media/`, so you can add products through the local
-`/admin/`. Those local changes remain local after you push code: Render's persistent disk is independent of Git
-and deliberately does not get overwritten on every deploy. If both localhost and the live site must edit the
-same catalogue, configure a shared PostgreSQL `DATABASE_URL` and `CLOUDINARY_URL` in both environments (see
-below). This makes admin changes from either place immediately visible in both.
+Render Free has an important limit: its runtime filesystem is temporary. Products or images added directly in
+the live `/admin/` may work until the next restart, spin-down, or deploy, but are not copied back into Git and
+can be lost. For automatic persistence of live admin additions, use a Render persistent disk or shared PostgreSQL
+and Cloudinary instead; those require storage configuration outside this source-snapshot workflow.
 
-**Existing live products:** on the first boot after attaching the disk, the committed `db.sqlite3` and `media/`
-are copied onto it only if the disk paths are empty. Existing files already on the disk are kept. If the live
-service currently has products or images that exist only on its temporary filesystem, export/backup them before
-restarting and restore them to the persistent database/disk; a redeploy cannot recover files Render has erased.
+## Automatic shared localhost and live editing (optional)
 
-## Shared localhost and live editing (optional)
-
-For localhost and Render to edit the same catalogue, use PostgreSQL and Cloudinary. Set the same
-`DATABASE_URL` and `CLOUDINARY_URL` in both environments. The SQLite persistent disk setup above is the simplest
-durable option when product changes happen on the live admin.
+For localhost and Render to edit the same catalogue with automatic persistence, use PostgreSQL and Cloudinary.
+Set the same `DATABASE_URL` and `CLOUDINARY_URL` in both environments.
 
 ### Images on Cloudinary (free, no card)
 1. Create an account at cloudinary.com and copy the **API Environment variable**
@@ -66,8 +54,8 @@ copied across. Once on PostgreSQL, stop committing `db.sqlite3`: it holds user a
 
 ### Checking which mode you are in
 `start.sh` runs `python manage.py check --deploy` on every boot and prints the result in Render's logs.
-`elmito.W001` means images are on the temporary disk; `elmito.W002` means the database is SQLite.
-Both gone means nothing important depends on the temporary disk.
+`elmito.W001` means images use local disk storage; `elmito.W002` means the database is SQLite. These are
+expected in the source snapshot workflow and indicate data can change at runtime only until the next restart.
 
 ## Admin account
 Set `ELMITO_ADMIN_USERNAME`, `ELMITO_ADMIN_EMAIL`, `ELMITO_ADMIN_MOBILE`, `ELMITO_ADMIN_FULL_NAME` and

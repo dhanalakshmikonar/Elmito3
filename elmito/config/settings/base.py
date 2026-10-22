@@ -87,13 +87,9 @@ TEMPLATES = [
     },
 ]
 
-_render_disk = bool(env("RENDER_EXTERNAL_HOSTNAME"))
-_default_database = (
-    "sqlite:////var/data/db.sqlite3" if _render_disk else f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-)
 DATABASES = {
     "default": dj_database_url.config(
-        default=_default_database, conn_max_age=600
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600
     )
 }
 
@@ -119,8 +115,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
-_default_media_root = "/var/data/media" if _render_disk else str(BASE_DIR / "media")
-MEDIA_ROOT = Path(env("MEDIA_ROOT", _default_media_root)).expanduser().resolve()
+MEDIA_ROOT = Path(env("MEDIA_ROOT", str(BASE_DIR / "media"))).expanduser().resolve()
 # Only for small stores on a persistent disk. Prefer S3/Cloudinary storage for real traffic.
 SERVE_MEDIA = env_bool("SERVE_MEDIA", False)
 STORAGES = {
