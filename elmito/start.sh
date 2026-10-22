@@ -9,6 +9,16 @@ if [[ -n "${RENDER_EXTERNAL_HOSTNAME:-}" ]]; then
   if [[ -z "${DATABASE_URL:-}" || ( "$DATABASE_URL" == sqlite:* && "$DATABASE_URL" != *"/var/data/"* ) ]]; then
     export DATABASE_URL="sqlite:////var/data/db.sqlite3"
   fi
+  # Never try to create /var/data on Render's read-only service filesystem.
+  # It exists and is writable only after a persistent disk is attached there.
+  if [[ "$DATABASE_URL" == *"/var/data/"* || ( -z "${CLOUDINARY_URL:-}" && "$MEDIA_ROOT" == /var/data* ) ]]; then
+    if [[ ! -d /var/data || ! -w /var/data ]]; then
+      echo "ERROR: Render persistent disk is missing or not writable at /var/data." >&2
+      echo "In Render > Elmito3 > Settings/Disks, attach a disk with mount path /var/data, then redeploy." >&2
+      echo "Alternatively, configure PostgreSQL DATABASE_URL and Cloudinary CLOUDINARY_URL instead." >&2
+      exit 1
+    fi
+  fi
 fi
 
 # A Render persistent disk is mounted only at runtime, so copy bundled media
@@ -21,7 +31,6 @@ fi
 # Seed the persistent SQLite database from the committed catalogue only on
 # its first start; subsequent deploys keep all live admin changes on the disk.
 if [[ "${DATABASE_URL:-}" == *"/var/data/db.sqlite3" ]]; then
-  mkdir -p /var/data
   if [[ ! -f /var/data/db.sqlite3 && -f "$PWD/db.sqlite3" ]]; then
     cp "$PWD/db.sqlite3" /var/data/db.sqlite3
   fi

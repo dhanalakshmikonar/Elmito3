@@ -14,7 +14,9 @@ Other variables (Razorpay, WhatsApp, email, admin bootstrap) are listed in `.env
 
 Attach a Render persistent disk to the web service:
 
-1. Open the service's **Disks** settings and add a disk mounted at `/var/data`.
+1. Open the service's **Settings > Disks** and add a disk mounted at `/var/data`. The service cannot start in
+   persistent-disk mode until this disk is attached; the startup script reports this directly if the mount is
+   missing or not writable.
 2. Redeploy. The start script seeds `/var/data/db.sqlite3` from the committed catalogue once, then uses that
    database and `/var/data/media` for future requests. Product or image changes made in `/admin/` on the live
    site survive code pushes, restarts and free-service spin-downs. Customers, orders and payments are stored
