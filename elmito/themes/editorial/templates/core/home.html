@@ -93,7 +93,7 @@
 <section class="section">
   <div class="wrap">
     <div class="section-head reveal"><div><p class="eyebrow"><b>Nº 04</b> New arrivals</p><h2>Just <em>in.</em></h2></div><a class="link-arrow" href="{% url 'products:shop' %}?sort=newest">See newest {% include "includes/icon.html" with name="arrow" %}</a></div>
-    <ul class="egrid">{% for product in new_arrivals|slice:":3" %}<li class="reveal" style="--d:{{ forloop.counter0 }}00ms">{% include "includes/product_card.html" %}</li>{% endfor %}</ul>
+    <ul class="egrid">{% for product in new_arrivals|slice:":4" %}<li class="reveal" style="--d:{{ forloop.counter0 }}00ms">{% include "includes/product_card.html" %}</li>{% endfor %}</ul>
   </div>
 </section>
 {% endif %}
