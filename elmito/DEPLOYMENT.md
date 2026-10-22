@@ -10,27 +10,35 @@
 
 Other variables (Razorpay, WhatsApp, email, admin bootstrap) are listed in `.env.example`.
 
-## How product images and data are stored
+## Persistent products, images and orders
 
-This project is arranged **the same way as the Noplastiks project**: the product images (`media/`) and the
-catalogue database (`db.sqlite3`) live in the repository next to the code. Every time Render starts or wakes
-the service, it restores exactly that snapshot, so the images and products you ship are always there, even
-after long inactivity. No extra service or setup is needed. `.gitignore` deliberately does **not** exclude
-`media/` or `db.sqlite3`.
+Attach a Render persistent disk to the web service:
 
-**Adding or changing products in this mode** (the Noplastiks workflow): run the site on your own computer,
-add the products and upload their images in `/admin/`, then commit and push `media/` **and** `db.sqlite3`.
-Render redeploys with the new snapshot.
+1. Open the service's **Disks** settings and add a disk mounted at `/var/data`.
+2. Redeploy. The start script seeds `/var/data/db.sqlite3` from the committed catalogue once, then uses that
+   database and `/var/data/media` for future requests. Product or image changes made in `/admin/` on the live
+   site survive code pushes, restarts and free-service spin-downs. Customers, orders and payments are stored
+   there too.
+3. Leave `DATABASE_URL` and `MEDIA_ROOT` unset to use these persistent-disk defaults. If you set them yourself,
+   use `sqlite:////var/data/db.sqlite3` and `/var/data/media` respectively. Do not set `CLOUDINARY_URL` unless
+   you want images stored in Cloudinary instead.
 
-**The limit of this arrangement:** Render erases its disk on every restart, deploy and idle spin-down (free
-services sleep after 15 minutes). So anything created *on the live site* is lost, namely images uploaded in the
-live admin, products added there, new customers, and **orders and payments**. That is fine for a catalogue
-you manage on your own computer. It is **not safe once customers can pay**: an order could vanish after the
-next sleep. Move to the permanent setup below before you take real payments.
+Localhost continues to use the repository's `db.sqlite3` and `media/`, so you can add products through the local
+`/admin/`. Those local changes remain local after you push code: Render's persistent disk is independent of Git
+and deliberately does not get overwritten on every deploy. If both localhost and the live site must edit the
+same catalogue, configure a shared PostgreSQL `DATABASE_URL` and `CLOUDINARY_URL` in both environments (see
+below). This makes admin changes from either place immediately visible in both.
 
-## Permanent setup (use this for a live store)
+**Existing live products:** on the first boot after attaching the disk, the committed `db.sqlite3` and `media/`
+are copied onto it only if the disk paths are empty. Existing files already on the disk are kept. If the live
+service currently has products or images that exist only on its temporary filesystem, export/backup them before
+restarting and restore them to the persistent database/disk; a redeploy cannot recover files Render has erased.
 
-Two independent upgrades. Nothing in the code changes; you only set environment variables.
+## Shared localhost and live editing (optional)
+
+For localhost and Render to edit the same catalogue, use PostgreSQL and Cloudinary. Set the same
+`DATABASE_URL` and `CLOUDINARY_URL` in both environments. The SQLite persistent disk setup above is the simplest
+durable option when product changes happen on the live admin.
 
 ### Images on Cloudinary (free, no card)
 1. Create an account at cloudinary.com and copy the **API Environment variable**
